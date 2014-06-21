@@ -43,7 +43,7 @@ function aspenyoutube_block_view($delta = '') {
 //Variable set-up.
 $resultsAmounthardcode = 20;
 $keyWord = 'aif12';
-$developerKey = 'AIzaSyDEZospc4apgkPkoFL8LOM4QYIt3ugF-6Q';
+$developerKey = 'xxx';
 $channelId = 'UCoiTVuiMdqBRMSBGMEcmxCw';
 //Making the call to youtube data api and getting the Json contents using drupal http request and drupal_http_build_query.
 
