@@ -43,14 +43,15 @@ function aspenyoutube_block_view($delta = '') {
 //Variable set-up.
 $resultsAmounthardcode = 20;
 $keyWord = 'aif12';
-$developerKey = 'xxx';
+$developerKey = 'AIzaSyDEZospc4apgkPkoFL8LOM4QYIt3ugF-6Q';
 $channelId = 'UCoiTVuiMdqBRMSBGMEcmxCw';
-//Making the call to youtube data api and getting the Json contents using drupal http request and drupal_http_build_query.
+//Making the call to youtube data api and getting the Json contents using drupal http request.
 
-$jsonData = file_get_contents("https://www.googleapis.com/youtube/v3/search?part=id%2Csnippet&channelId=".$channelId."&maxResults=".$resultsAmounthardcode."&q=".$keyWord."&key=".$developerKey);
+$jsondata = drupal_http_request("https://www.googleapis.com/youtube/v3/search?part=id%2Csnippet&channelId=".$channelId."&maxResults=".$resultsAmounthardcode."&q=".$keyWord."&key=".$developerKey);
+$json = drupal_json_decode($jsondata->data);
 
 //More Variable set-up and using Drupal Json_decode function to decode the url contents to parse.
-$json = json_decode($jsonData, true);
+
 $firstVideoNum = 0;
 $secondVideoNum = 1;
 $resultsAmount = (count($json['items']) -1);
@@ -60,6 +61,7 @@ $mainTitle = preg_replace('/[^A-Za-z0-9 \?!]/', '', $mainTitle);
 $mainDescrip = $json['items'][$firstVideoNum]['snippet']['description'];
 $mainDescrip = preg_replace('/[^A-Za-z0-9 \?!]/', '', $mainDescrip)."...";
 $postServer = htmlspecialchars($_SERVER["PHP_SELF"]);
+
 //adding css for this module.
 drupal_add_css(drupal_get_path('module', 'aspenyoutube') . '/default7.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
 
@@ -68,8 +70,10 @@ $block['content'] ="<div id='newvideoStatic'>";
 //Main Video container div set up.
 $block['content'] .="<div id='newvideomainContainer'>";
 $block['content'] .="<div class='newvideoContainer'><iframe id='mainvideo' name='mainvideo' src='//www.youtube.com/embed/$mainVideoId?rel=0' frameborder='0' allowfullscreen></iframe></div>";
-//main title and description divs set up.
+//main title and description divs set up. 
 $block['content'] .="<div id='maintext'><h4>$mainTitle</h4><p>$mainDescrip</p></div>";
+//rendering the form array set up in this module. 
+
 $block['content'] .="</div>";
 $block['content'] .="</div>";
 
@@ -103,5 +107,44 @@ $block['content'] .="</div>";
 
 }
 
+function aspenyoutubeinput_form($form, &$form_state) {
+        // Now the fun begins. 
+        // we will only provide two form elements.
+        // 1. an input for the keyword
+        // 2. a submit button
+        // You can add as much or as little to this form as
+        // needed.  See the forms api for all possible elements.
+ 
+        $form['keywordtwo'] = array(
+                // #type tells drupal what kind of element to build
+                '#type' => 'textfield',
+                // we want this field to be required
+                '#required' => TRUE,
+                // The "label" for this field
+                '#title' => t("Your Keyword"),
+                // Optional description
+                '#description' => t('Keyword Search'),
+        );
+ 
+        $form['submit'] = array(
+                '#type' => 'submit',
+                // #value is the text to display inside the button
+                '#value' => t('Submit'),
+        );
+ 
+        return $form;
+}
 
 
+/*
+ * Define a validation function that drupal will
+ * automatically call when the submit button is pressed.
+ */
+function aspenyoutubeinput_form_validate($form, &$form_state) {
+        // Drupal stows away all of the form elements into
+        // $form_state['values'].  We find our 'friends_email'
+        // element and assign it to a variable for easy
+        // reference.
+        $keywordtwo = $form_state['values']['keywordtwo'];
+}
+ 
